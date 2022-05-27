@@ -1,5 +1,6 @@
 import os
 import openai
+from newspaper import Article
 import json
 
 
@@ -21,19 +22,30 @@ def handler(event, context):
         for row in rows:
             row_number = row[0]
 
-            text = row[1]
+            article_url = row[1]
+            print("parsed url: " + article_url)
+            article = Article(article_url)
+            article.download()
+            print("downloaded article")
+            article.parse()
+            print("article parsed")
+            article.nlp()
+            print("ran nlp")
 
-            response = openai.Completion.create(
-                engine="text-davinci-002",
-                prompt=text + "\n\ntl;dr\n\n",
-                temperature=0.7,
-                max_tokens=60,
-                top_p=1.0,
-                frequency_penalty=0.0,
-                presence_penalty=0.0
-                )
+            ### using openai to generate summary
+            #
+            # response = openai.Completion.create(
+            #     engine="text-davinci-002",
+            #     prompt=article.text + "\n\ntl;dr\n\n",
+            #     temperature=0.7,
+            #     max_tokens=60,
+            #     top_p=1.0,
+            #     frequency_penalty=0.0,
+            #     presence_penalty=0.0
+            #     )
             
-            output_value = response.choices[0].text
+            output_value = article.summary
+            print("summary: " + output_value)
 
             row_to_return = [row_number, output_value]
 
@@ -43,7 +55,7 @@ def handler(event, context):
 
     except Exception as err:
         status_code = 400
-        json_compatible_string_to_return = event_body
+        json_compatible_string_to_return = [event_body, repr(err)]
 
     return {
         'statusCode': status_code,

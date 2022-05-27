@@ -1,1 +1,3 @@
 openai
+newspaper3k
+awslambdaric
