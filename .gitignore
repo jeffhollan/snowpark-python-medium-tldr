@@ -1,3 +1,4 @@
 packages/
 config.py
 *.zip
+__pycache__
