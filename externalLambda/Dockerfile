@@ -14,6 +14,7 @@ RUN apt-get update && \
     libcurl4-openssl-dev \
     libxml2-dev libxslt-dev libjpeg-dev zlib1g-dev libpng-dev
 RUN pip install nltk
+RUN python -m nltk.downloader -d /usr/local/share/nltk_data punkt
 
 RUN curl https://raw.githubusercontent.com/codelucas/newspaper/master/download_corpora.py | python3
 
@@ -32,16 +33,8 @@ RUN pip install \
 
 COPY lambda.py ${FUNCTION_DIR}
 
-# Multi-stage build: grab a fresh copy of the base image
-FROM python:buster
-
-# Include global arg in this stage of the build
-ARG FUNCTION_DIR
 # Set working directory to function root directory
 WORKDIR ${FUNCTION_DIR}
-
-# Copy in the build image dependencies
-COPY --from=build-image ${FUNCTION_DIR} ${FUNCTION_DIR}
 
 ENTRYPOINT [ "/usr/local/bin/python", "-m", "awslambdaric" ]
 CMD [ "lambda.handler" ]

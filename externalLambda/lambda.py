@@ -23,33 +23,33 @@ def handler(event, context):
             row_number = row[0]
 
             article_url = row[1]
-            print("parsed url: " + article_url)
             article = Article(article_url)
-            article.download()
-            print("downloaded article")
-            article.parse()
-            print("article parsed")
-            article.nlp()
-            print("ran nlp")
+            try:
+                article.download()
+                article.parse()
+                article.nlp()
+                output_value = article.summary
 
-            ### using openai to generate summary
-            #
-            # response = openai.Completion.create(
-            #     engine="text-davinci-002",
-            #     prompt=article.text + "\n\ntl;dr\n\n",
-            #     temperature=0.7,
-            #     max_tokens=60,
-            #     top_p=1.0,
-            #     frequency_penalty=0.0,
-            #     presence_penalty=0.0
-            #     )
+
+                ### using openai to generate summary
+                #
+                # response = openai.Completion.create(
+                #     engine="text-davinci-002",
+                #     prompt=article.text + "\n\ntl;dr\n\n",
+                #     temperature=0.7,
+                #     max_tokens=60,
+                #     top_p=1.0,
+                #     frequency_penalty=0.0,
+                #     presence_penalty=0.0
+                #     )
+            except Exception as e:
+                output_value = "Error: " + repr(e)
+                print(repr(e))
             
-            output_value = article.summary
-            print("summary: " + output_value)
+            finally:
+                row_to_return = [row_number, output_value]
 
-            row_to_return = [row_number, output_value]
-
-            array_of_rows_to_return.append(row_to_return)
+                array_of_rows_to_return.append(row_to_return)
 
         json_compatible_string_to_return = json.dumps({"data" : array_of_rows_to_return})
 
