@@ -36,5 +36,6 @@ COPY lambda.py ${FUNCTION_DIR}
 # Set working directory to function root directory
 WORKDIR ${FUNCTION_DIR}
 
-ENTRYPOINT [ "/usr/local/bin/python", "-m", "awslambdaric" ]
-CMD [ "lambda.handler" ]
+ENV FLASK_APP=lambda
+ENTRYPOINT [ "/usr/local/bin/python", "-m", "flask" ]
+CMD [ "run", "--host=0.0.0.0" ]
