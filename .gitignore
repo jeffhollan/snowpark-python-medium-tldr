@@ -2,3 +2,4 @@ packages/
 config.py
 *.zip
 __pycache__
+.DS_Store
